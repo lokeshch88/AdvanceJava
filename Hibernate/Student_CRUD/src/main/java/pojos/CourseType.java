@@ -8,4 +8,9 @@ public enum CourseType {
 	CourseType(int fee) {
 		this.fee=fee;
 	}
+
+	public int getFee() {
+		return fee;
+	}
+	
 }
