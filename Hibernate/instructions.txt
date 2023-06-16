@@ -1,0 +1,42 @@
+2.1 
+Create Student pojo 
+properties : 
+ studentId : Integer (PK) ,first name , last name,email,password,course(enum with admission fees), dob : LocalDate 
+Add JPA annotations
+Add <mapping> entry
+Test proper creation of "students" table.
+Refer to our Employee POJO for annotations.
+
+2.2 
+Solve this
+1. Student registration (ids should start from 1001 onwards, HOW will you achieve it ????)
+i/p : student details (first name , last name,email,password,course(enum),dob )
+o/p : Reg successful , with student id(auto generated from hibernate, 1001 onwards) 
+or failure mesg.
+
+2. Student login
+i/p : email , password
+o/p : A mesg : login successful , with student details lifted from db
+or failure mesg.
+
+3. Get all students from a specific course
+i/p : course name
+o/p : display list of students from the course
+
+4. Change course
+i/p : student id , course name
+o/p : in case of invalid id --error mesg
+in case of success : course updation message
+
+Maven Clean Up instructions (If the project is not working properly!!)
+1. Force update the project
+R Click on project --Maven --Update Project (Force update it!)
+
+2.  If you are having problems still , in downloading the Maven hibernate dependencies , 
+Use Maven clean option n Project clean
+
+3. Worst case , if it still doesn't work 
+Exit STS IDE
+Delete maven <repository> folder 
+Enter STS 
+Force update Maven project
