@@ -1,0 +1,17 @@
+Request resp flow
+1. http://localhost:8080/day14_boo/
+-->D.S--H.M-->HomePageController.showHomePage  D.S --> invokes req handling method 
+--> rets: LVN + 2 model attrs -->D.S -->LVN-->V.R--> AVN(prefix+LVN+sufix)
+-->D.S chks for model attr (peesents yes)--> adds model attrs uder req scope --> forward index.jsp
+Resp: index.jsp
+
+2.After clnt click on "Show All Departments" link
+ req url: http://localhost:8080/day14_boot/departments/list
+--> D.S invokes : DepartmentController.getDeptList()---> MnV
+--> renders the dept/list.jsp
+Resp : list.jsp
+
+
+3. After clnt slects dept : RnD
+req url : http://localhost:8080/day14_boot/emp/list, method=post
+payload(req body): dept_id=1
