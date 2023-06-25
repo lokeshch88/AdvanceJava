@@ -1,0 +1,4 @@
+create product with id,desc,name
+
+create layers: entity,repository,service,controller
+1)get list of all product
