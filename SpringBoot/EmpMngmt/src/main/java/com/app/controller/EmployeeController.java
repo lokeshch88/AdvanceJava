@@ -1,60 +1,94 @@
 package com.app.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import java.util.List;
 
-import com.app.pojos.Employee;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.app.dto.ApiResponse;
+import com.app.dto.AuthRequestDTO;
+import com.app.entities.Employee;
 import com.app.service.EmployeeService;
 
-@Controller
-@RequestMapping("/emp")
+@RestController // =@Controller + @ResponseBody
+@RequestMapping("/employees")
+@CrossOrigin(origins = "http://localhost:3000")
+//To Tell SC to add CORS resp header : cross origin resourse sharing  , 
+//so that web browser security model allows accessing the resp.
 public class EmployeeController {
-	//dependency: service layer i/f
+	// dep : service layer i/f
 	@Autowired
 	private EmployeeService empService;
-	
+
 	public EmployeeController() {
-		System.out.println("in ctor of "+getClass());
-		
+		System.out.println("in def ctor of " + getClass());
 	}
-	/*
-	 * http://localhost:8080/day14_boot/emp/list, method=post
-	   payload(req body): dept_id=1
-	*/
-	//@RequestParam: anno to bind incoming rq param-->
-	//method argument, does the parsing also!
-	//match rq param name with method arg name
-	//SC: Long dept_id=Long.parseLong(request.getParameter("dept_id)
-	@PostMapping("/list")
-	public String listEmpByDept(@RequestParam Long dept_id, Model map) { //req params should match wit param (dept_id)
-		System.out.println("in list emps by dept "+dept_id);
-		map.addAttribute("emp_list", empService.getAllEmpsByDeptId(dept_id));//(model attrName, model attr value)
-		return "/emp/list"; //AVN: /WEB-INF/views/emp/list.jsp
+
+	// http://localhost:8080/employees/ , method = GET
+	// add a req handling method to ret list of emps
+	@GetMapping
+	public List<Employee> listEmps() {
+		System.out.println("in list emps");
+		return empService.getAllEmployees();
 	}
-	@GetMapping("/signin")
-	public String showLoginForm() {
-		System.out.println("in show login form");
-		return "/emp/login";
-		
+
+	// http://localhost:8080/employees/ , method = POST
+	// add a req handling method to save an emp
+	@PostMapping
+	public ResponseEntity<?> saveEmpDetails(@RequestBody Employee transientEmp) {
+		System.out.println("in save " + transientEmp);// not null , id : null
+		return new ResponseEntity<>(empService.addEmpDetails(transientEmp), HttpStatus.CREATED);
 	}
-	
+
+	// http://localhost:8080/employees/10 , method = DELETE
+	@DeleteMapping("/{empId}")
+	public ApiResponse deleteEmpDetails(@PathVariable Long empId) {
+		System.out.println("in del emp dtls " + empId);
+		// invoke service layer method , get it's resp , wrap it in a DTO -->
+		// marshalling --> json --sent to fron end
+		return new ApiResponse(empService.deleteEmpDetails(empId));
+	}
+
+	// http://localhost:8080/employees/10 , method = GET
+	@GetMapping("/{empId}")
+	public Employee getEmpDetails(@PathVariable Long empId) {
+		System.out.println("in get emp dtls " + empId);
+		return empService.getEmpDetails(empId);
+	}
+
+	// http://localhost:8080/employees , method = PUT
+	@PutMapping
+	public Employee updateEmpDetails(@RequestBody Employee detachedEmp) {
+
+		System.out.println("in update emp " + detachedEmp);// id : not null
+		return empService.updateEmpDetails(detachedEmp);
+	}
+
+	// http://host:port/employees/signin , Method : POST
 	@PostMapping("/signin")
-	public String processLoginForm(@RequestParam String email,
-			@RequestParam String password, Model map) {
-		System.out.println("in process login form");
-		Employee emp = empService.authenticateEmp(email,password);
-		if(emp!=null) //valid login--> forward clnt to detal pg
-		{
-			map.addAttribute("emp_details",emp);
-			return "/emp/details"; 
-		}
-		//invalid login
-		return "/emp/invalid";
+	public ResponseEntity<?> authenticateEmp(@RequestBody @Valid AuthRequestDTO request) {
+		System.out.println("in auth emp " + request);
+	//	try {
+		return ResponseEntity.status(HttpStatus.OK)//ok:200
+				.body(empService.authenticateEmp(request)); // ResponseEntity(status code-->200,header-->default,body-->resp dto)
+//		} catch (RuntimeException e) {
+//			System.out.println(e);
+//			return ResponseEntity.
+//					status(HttpStatus.NOT_FOUND).     //404
+//					body(new ApiResponse(e.getMessage()));
+//		}
 	}
 
 }
